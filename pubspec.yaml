@@ -10,6 +10,13 @@ dependencies:
   get: 4.6.6
   flutter: 
     sdk: flutter
+  http_auth: ^1.0.4
+  http: ^0.13.1
+  ntlm: ^2.0.1
+  json_annotation: ^4.7.0
+  build_runner: ^2.3.2
+  json_serializable: ^6.6.1
+  shared_preferences: ^2.3.2
 
 dev_dependencies: 
   flutter_lints: 4.0.0
