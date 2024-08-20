@@ -1,5 +1,7 @@
 import 'package:get/get.dart';
 
+import '../modules/addcommande/bindings/addcommande_binding.dart';
+import '../modules/addcommande/views/addcommande_view.dart';
 import '../modules/clients/bindings/clients_binding.dart';
 import '../modules/clients/views/clients_view.dart';
 import '../modules/commandes/bindings/commandes_binding.dart';
@@ -43,6 +45,11 @@ class AppPages {
       name: _Paths.DETAILS,
       page: () => const DetailsView(),
       binding: DetailsBinding(),
+    ),
+    GetPage(
+      name: _Paths.ADDCOMMANDE,
+      page: () => const AddcommandeView(),
+      binding: AddcommandeBinding(),
     ),
   ];
 }

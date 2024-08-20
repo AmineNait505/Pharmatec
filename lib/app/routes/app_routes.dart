@@ -8,6 +8,7 @@ abstract class Routes {
   static const CLIENTS = _Paths.CLIENTS;
   static const COMMANDES = _Paths.COMMANDES;
   static const DETAILS = _Paths.DETAILS;
+  static const ADDCOMMANDE = _Paths.ADDCOMMANDE;
 }
 
 abstract class _Paths {
@@ -17,4 +18,5 @@ abstract class _Paths {
   static const CLIENTS = '/clients';
   static const COMMANDES = '/commandes';
   static const DETAILS = '/details';
+  static const ADDCOMMANDE = '/addcommande';
 }
