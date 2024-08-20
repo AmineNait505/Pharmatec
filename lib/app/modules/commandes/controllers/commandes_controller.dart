@@ -1,5 +1,6 @@
 import 'package:get/get.dart';
 import 'package:pharmatec/app/data/models/commande.dart';
+import 'package:pharmatec/app/routes/app_pages.dart';
 import 'package:pharmatec/app/services/commandeServices.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
@@ -53,5 +54,13 @@ class CommandesController extends GetxController {
     if (clientId.isNotEmpty) {
       await fetchCommandes(clientId.value);
     }
+  }
+
+  Future<void> saveCommandeAndNavigate(String commandeNo) async {
+    final prefs = await SharedPreferences.getInstance();
+    await prefs.setString('selected_commande_no', commandeNo);
+
+    print(commandeNo);
+    Get.toNamed(Routes.DETAILS); // Adjust route name and arguments as needed
   }
 }
