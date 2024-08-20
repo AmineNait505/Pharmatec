@@ -106,14 +106,19 @@ class DetailsView extends GetView<DetailsController> {
           },
         );
       }),
-      floatingActionButton: FloatingActionButton(
-        backgroundColor: secondColor,
-        onPressed: () {
-          
-        },
-        child: const Icon(Icons.add,color: Colors.white,),
-        tooltip: 'Add Lines in the commande',
-      ),
+       floatingActionButton: Obx(() {
+        
+        return controller.CommandeStatus.value == 'Open'
+            ? FloatingActionButton(
+                backgroundColor: secondColor,
+                onPressed: () {
+                  // Add your logic here
+                },
+                child: const Icon(Icons.add, color: Colors.white),
+                tooltip: 'Add Lines in the commande',
+              )
+            : SizedBox.shrink(); 
+      }),
     );
   }
 }

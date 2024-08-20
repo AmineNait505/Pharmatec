@@ -11,6 +11,7 @@ class DetailsController extends GetxController {
   final  CommandeServices commandservice=CommandeServices();
   final count = 0.obs;
   final CommandeNo = ''.obs;
+  final CommandeStatus = ''.obs;
   @override
   void onInit() {
     super.onInit();
@@ -46,7 +47,7 @@ class DetailsController extends GetxController {
     Future<void> loadClientData() async {
     final prefs = await SharedPreferences.getInstance();
     CommandeNo.value = prefs.getString('selected_commande_no') ?? '';
-
+    CommandeStatus.value=prefs.getString('commandeStatus') ?? '';
     if (CommandeNo.isNotEmpty) {
       await fetchLines(CommandeNo.value);
     }

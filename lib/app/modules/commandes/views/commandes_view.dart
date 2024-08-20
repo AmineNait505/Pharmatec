@@ -201,7 +201,7 @@
                               alignment: Alignment.centerRight,
                               child: TextButton(
                                 onPressed: () {
-                                  controller.saveCommandeAndNavigate(commande.id);
+                                  controller.saveCommandeAndNavigate(commande.id,commande.status);
                                 },
                                 style: TextButton.styleFrom(
                                   foregroundColor: secondColor,
@@ -222,7 +222,7 @@
         floatingActionButton: FloatingActionButton(
           backgroundColor: secondColor,
           onPressed: () {
-            
+            Get.toNamed(Routes.ADDCOMMANDE);
           },
           child: const Icon(Icons.add,color: Colors.white,),
           tooltip: 'Add Lines in the commande',

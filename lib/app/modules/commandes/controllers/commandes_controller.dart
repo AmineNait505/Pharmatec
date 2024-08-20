@@ -56,11 +56,11 @@ class CommandesController extends GetxController {
     }
   }
 
-  Future<void> saveCommandeAndNavigate(String commandeNo) async {
+  Future<void> saveCommandeAndNavigate(String commandeNo,String status) async {
     final prefs = await SharedPreferences.getInstance();
     await prefs.setString('selected_commande_no', commandeNo);
-
+    await prefs.setString('commandeStatus', status);
     print(commandeNo);
-    Get.toNamed(Routes.DETAILS); // Adjust route name and arguments as needed
+    Get.toNamed(Routes.DETAILS); 
   }
 }

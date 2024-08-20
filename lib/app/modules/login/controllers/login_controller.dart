@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:pharmatec/app/routes/app_pages.dart';
 import 'package:pharmatec/app/services/authentificationServices.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 class LoginController extends GetxController {
   var email = ''.obs;
@@ -28,6 +29,10 @@ class LoginController extends GetxController {
   void togglePasswordVisibility() {
     obscureText.value = !obscureText.value;
   }
+   Future<void> _saveSalespersonInfo(String email) async {
+    final prefs = await SharedPreferences.getInstance();
+    await prefs.setString('salesperson', email);
+  }
 
   Future<void> onLoginPressed() async {
     isLoading.value = true;
@@ -37,7 +42,8 @@ class LoginController extends GetxController {
     try {
       Future.delayed(Duration(seconds: 3)); 
       await authService.login(email.value, password.value);
-      // Handle successful login
+      print(email.value);
+      await _saveSalespersonInfo(email.value);
       Get.snackbar('Succès', 'Connexion réussie !',
           backgroundColor: Colors.green, colorText: Colors.white,
           snackPosition: SnackPosition.BOTTOM,);
