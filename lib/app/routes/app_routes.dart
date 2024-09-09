@@ -9,6 +9,7 @@ abstract class Routes {
   static const COMMANDES = _Paths.COMMANDES;
   static const DETAILS = _Paths.DETAILS;
   static const ADDCOMMANDE = _Paths.ADDCOMMANDE;
+  static const NEWCOMMANDE = _Paths.NEWCOMMANDE;
 }
 
 abstract class _Paths {
@@ -19,4 +20,5 @@ abstract class _Paths {
   static const COMMANDES = '/commandes';
   static const DETAILS = '/details';
   static const ADDCOMMANDE = '/addcommande';
+  static const NEWCOMMANDE = '/newcommande';
 }
