@@ -54,10 +54,10 @@ class LoginController extends GetxController {
           snackPosition: SnackPosition.BOTTOM,);
     } on InvalidUsernameException catch (e) {
       emailError.value = e.message;
-      emailFocusNode.requestFocus(); // Focus on the email field
+      emailFocusNode.requestFocus();
     } on InvalidPasswordException catch (e) {
       passwordError.value = e.message;
-      passwordFocusNode.requestFocus(); // Focus on the password field
+      passwordFocusNode.requestFocus();
     } catch (e) {
       Get.snackbar('Erreur', 'Une erreur inconnue s\'est produite.',
           backgroundColor: Colors.red, colorText: Colors.white,

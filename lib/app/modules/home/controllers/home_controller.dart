@@ -13,7 +13,7 @@ class HomeController extends GetxController {
 
   Future<void> loadClientData() async {
     final prefs = await SharedPreferences.getInstance();
-    clientName.value = prefs.getString('client_name')! ;
-    clientId.value = prefs.getString('client_id') !;
+    clientName.value = prefs.getString('client_name')??'uknowen' ;
+    clientId.value = prefs.getString('client_id') ??'uknowen' ;
   }
 }

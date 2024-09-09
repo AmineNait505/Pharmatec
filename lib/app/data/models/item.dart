@@ -4,8 +4,8 @@ List<Item> itemsFromJson(dynamic str) =>
 class Item {
   final String id;
   final String nom;
-  final int qte;
-  final int price;
+   int qte;
+   int price;
 
 
   Item({required this.id,  required this.nom,required this.qte ,required this.price});

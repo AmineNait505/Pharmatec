@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:flutter/services.dart';
 import 'package:get/get.dart';
 import 'package:pharmatec/app/core/values/colors.dart';
 import '../controllers/addcommande_controller.dart';
@@ -12,7 +11,7 @@ class AddcommandeView extends GetView<AddcommandeController> {
     return Scaffold(
       appBar: AppBar(
         backgroundColor: secondColor,
-        title: const Text('Add to Commande', style: TextStyle(color: Colors.white)),
+        title: const Text('Ajouter au Commande', style: TextStyle(color: Colors.white)),
         centerTitle: true,
         leading: IconButton(
           icon: Icon(Icons.arrow_back, color: Colors.white),
@@ -27,29 +26,24 @@ class AddcommandeView extends GetView<AddcommandeController> {
             const SizedBox(height: 16),
             _buildArticleField(context),
             const SizedBox(height: 16),
-            _buildPriceQuantityDiscountFields(),
-            const SizedBox(height: 16),
-        Obx(() {
-              // Determine if the button should be enabled
-              final isQuantityError = controller.quantityError.value.isNotEmpty;
-              return ElevatedButton(
-                onPressed: isQuantityError ? null : () {
-                  controller.submitOrder();
-                },
-                style: ElevatedButton.styleFrom(
-                  backgroundColor: isQuantityError ? Colors.grey : secondColor, // Button color
-                 
-                ),
-                child:  Text('Add to Commande', style:TextStyle(color: isQuantityError ? Colors.grey[800] : Colors.white,) ),
-              );
-            }),
+            _buildSelectedArticlesList(),
           ],
         ),
       ),
+      floatingActionButton: Obx(() {
+        return controller.selectedArticles.isNotEmpty
+            ? FloatingActionButton(
+                onPressed: () {
+                  // Action du bouton Continuer
+                },
+                backgroundColor: secondColor,
+                child: const Icon(Icons.arrow_forward),
+              )
+            : SizedBox.shrink();
+      }),
     );
   }
 
-  // Category Field with search and dropdown functionality
   Widget _buildCategoryField(BuildContext context) {
     return Obx(() {
       final selectedCategory = controller.selectedCategory.value;
@@ -61,12 +55,13 @@ class AddcommandeView extends GetView<AddcommandeController> {
             focusNode: controller.categoryFocusNode,
             readOnly: true,
             onTap: () => _showCategoryDropdown(context),
-            controller: TextEditingController(text:
-              selectedCategory != null ?
-              '${selectedCategory.description} (ID: ${selectedCategory.id})' : ''
+            controller: TextEditingController(
+              text: selectedCategory != null
+                  ? '${selectedCategory.description} (ID: ${selectedCategory.id})'
+                  : '',
             ),
             decoration: InputDecoration(
-              labelText: 'Select Category',
+              labelText: 'Sélectionner la Catégorie',
               labelStyle: TextStyle(
                 color: controller.categoryFocusNode.hasFocus ? primaryColor : Colors.black54,
               ),
@@ -95,302 +90,197 @@ class AddcommandeView extends GetView<AddcommandeController> {
     });
   }
 
-  // Article Field with dropdown functionality
   Widget _buildArticleField(BuildContext context) {
     return Obx(() {
       final selectedArticle = controller.selectedArticle.value;
+      final articleController = TextEditingController(
+        text: selectedArticle != null
+            ? '${selectedArticle.nom} (ID: ${selectedArticle.id})'
+            : '',
+      );
 
-      return TextField(
-        focusNode: controller.articleFocusNode,
-        readOnly: true,
-        onTap: () => _showArticleDropdown(context),
-        controller: TextEditingController(text:
-          selectedArticle != null ?
-          '${selectedArticle.nom} (ID: ${selectedArticle.id})' : ''
-        ),
-        decoration: InputDecoration(
-          labelText: 'Select Article',
-          labelStyle: TextStyle(
-            color: controller.articleFocusNode.hasFocus ? primaryColor : Colors.black54,
-          ),
-          border: OutlineInputBorder(
-            borderRadius: BorderRadius.circular(12),
-            borderSide: BorderSide(
-              color: controller.articleFocusNode.hasFocus ? primaryColor : Colors.grey,
+      return Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          TextField(
+            focusNode: controller.articleFocusNode,
+            readOnly: true,
+            onTap: () => _showArticleDropdown(context),
+            controller: articleController,
+            decoration: InputDecoration(
+              labelText: 'Sélectionner l\'Article',
+              labelStyle: TextStyle(
+                color: controller.articleFocusNode.hasFocus ? primaryColor : Colors.black54,
+              ),
+              border: OutlineInputBorder(
+                borderRadius: BorderRadius.circular(12),
+                borderSide: BorderSide(
+                  color: controller.articleFocusNode.hasFocus ? primaryColor : Colors.grey,
+                ),
+              ),
+              focusedBorder: OutlineInputBorder(
+                borderRadius: BorderRadius.circular(12),
+                borderSide: BorderSide(
+                  color: primaryColor,
+                ),
+              ),
+              enabledBorder: OutlineInputBorder(
+                borderRadius: BorderRadius.circular(12),
+                borderSide: BorderSide(
+                  color: Colors.grey,
+                ),
+              ),
             ),
           ),
-          focusedBorder: OutlineInputBorder(
-            borderRadius: BorderRadius.circular(12),
-            borderSide: BorderSide(
-              color: primaryColor,
-            ),
-          ),
-          enabledBorder: OutlineInputBorder(
-            borderRadius: BorderRadius.circular(12),
-            borderSide: BorderSide(
-              color: Colors.grey,
-            ),
-          ),
-        ),
+        ],
       );
     });
   }
 
-  // Show Category Dropdown List
+  Widget _buildSelectedArticlesList() {
+    return Obx(() {
+      if (controller.selectedArticles.isEmpty) {
+        return const Text('Aucun article sélectionné');
+      }
+
+      return Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          const Text('Articles Sélectionnés:', style: TextStyle(fontWeight: FontWeight.bold)),
+          const SizedBox(height: 8),
+          ListView.builder(
+            shrinkWrap: true,
+            itemCount: controller.selectedArticles.length,
+            itemBuilder: (context, index) {
+              final article = controller.selectedArticles[index];
+              return ListTile(
+                title: Text(
+                  article.nom,
+                  style: const TextStyle(fontWeight: FontWeight.bold),
+                ),
+                subtitle: Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  children: [
+                    Text(
+                      article.qte > 0 ? 'En stock' : 'Rupture de stock',
+                      style: TextStyle(
+                        color: article.qte > 0 ? Colors.green : Colors.red,
+                      ),
+                    ),
+                    Text(
+                      '${article.price.toStringAsFixed(2)} TND',
+                    ),
+                  ],
+                ),
+                trailing: IconButton(
+                  icon: const Icon(Icons.remove_circle, color: Colors.red),
+                  onPressed: () => controller.removeArticle(article),
+                ),
+              );
+            },
+          ),
+        ],
+      );
+    });
+  }
+
   void _showCategoryDropdown(BuildContext context) {
     showModalBottomSheet(
       context: context,
       builder: (context) {
-        return Column(
-          children: [
-            TextField(
-              onChanged: (query) => controller.filterCategories(query),
-              decoration: const InputDecoration(
-                labelText: 'Search Categories by ID',
-                prefixIcon: Icon(Icons.search),
+        return Obx(() {
+          return Column(
+            children: [
+              Padding(
+                padding: const EdgeInsets.all(8.0),
+                child: TextField(
+                  onChanged: (value) => controller.filterCategories(value),
+                  decoration: InputDecoration(
+                    hintText: 'Rechercher une Catégorie',
+                    border: OutlineInputBorder(
+                      borderRadius: BorderRadius.circular(12),
+                    ),
+                  ),
+                ),
               ),
-            ),
-            Expanded(
-              child: Obx(() {
-                if (controller.isLoading.value) {
-                  return const Center(child: CircularProgressIndicator());
-                }
-
-                if (controller.errorMessage.isNotEmpty) {
-                  return Center(
-                    child: Text(controller.errorMessage.value, style: const TextStyle(color: Colors.red)),
-                  );
-                }
-
-                if (controller.filteredCategories.isEmpty) {
-                  return const Center(child: Text('No categories found'));
-                }
-
-                return ListView.builder(
+              Expanded(
+                child: ListView.builder(
                   itemCount: controller.filteredCategories.length,
                   itemBuilder: (context, index) {
                     final category = controller.filteredCategories[index];
                     return ListTile(
                       title: Text(category.description),
-                      subtitle: Text('Code Catégorie: ${category.id}'),
+                      subtitle: Text('ID: ${category.id}'),
                       onTap: () {
                         controller.selectCategory(category);
-                        Navigator.pop(context); // Close the dropdown
+                        Get.back();
                       },
                     );
                   },
-                );
-              }),
-            ),
-          ],
-        );
+                ),
+              ),
+            ],
+          );
+        });
       },
     );
   }
 
-  // Show Article Dropdown List
   void _showArticleDropdown(BuildContext context) {
     showModalBottomSheet(
       context: context,
       builder: (context) {
-        return Column(
-          children: [
-            TextField(
-              onChanged: (query) {
-                if (query.isEmpty) {
-                  // Reset the filtered articles list when the query is empty
-                  controller.filteredArticles.value = [];
-                } else {
-                  if (controller.selectedCategory.value != null) {
-                    controller.filterArticles(query);
-                  } else if (query.length >= 2) {
-                    controller.fetchArticleByCode(query);
-                  }
-                }
-              },
-              decoration: const InputDecoration(
-                labelText: 'Search Articles by ID',
-                prefixIcon: Icon(Icons.search),
+        return Obx(() {
+          return Column(
+            children: [
+              Padding(
+                padding: const EdgeInsets.all(8.0),
+                child: TextField(
+                  onChanged: (value) => controller.filterArticles(value),
+                  decoration: InputDecoration(
+                    hintText: 'Rechercher un Article',
+                    border: OutlineInputBorder(
+                      borderRadius: BorderRadius.circular(12),
+                    ),
+                  ),
+                ),
               ),
-            ),
-            Expanded(
-              child: Obx(() {
-                if (controller.isLoading.value) {
-                  return const Center(child: CircularProgressIndicator());
-                }
-
-                if (controller.errorMessage.isNotEmpty) {
-                  return Center(
-                    child: Text(controller.errorMessage.value, style: const TextStyle(color: Colors.red)),
-                  );
-                }
-
-                if (controller.filteredArticles.isEmpty) {
-                  return const Center(child: Text('No articles found'));
-                }
-
-                return ListView.builder(
+              Expanded(
+                child: ListView.builder(
                   itemCount: controller.filteredArticles.length,
                   itemBuilder: (context, index) {
                     final article = controller.filteredArticles[index];
-                    final stockStatus = article.qte > 0 ? 'En stock' : 'Hors stock';
                     return ListTile(
                       title: Text(article.nom),
                       subtitle: Row(
                         mainAxisAlignment: MainAxisAlignment.spaceBetween,
                         children: [
-                          Text('ID: ${article.id}'),
-                          Text(stockStatus, style: TextStyle(color: article.qte > 0 ? Colors.green : Colors.red)),
+                          Text(
+                            article.id,
+                          ),
+                          Text(
+                            '${article.price.toStringAsFixed(2)} TND',
+                          ),
+                          Text(
+                            article.qte > 0 ? 'En stock' : 'Rupture de stock',
+                            style: TextStyle(
+                              color: article.qte > 0 ? Colors.green : Colors.red,
+                            ),
+                          ),
                         ],
                       ),
                       onTap: () {
                         controller.selectArticle(article);
-                        Navigator.pop(context); // Close the dropdown
+                        Get.back();
                       },
                     );
                   },
-                );
-              }),
-            ),
-          ],
-        );
+                ),
+              ),
+            ],
+          );
+        });
       },
     );
-  }
-
-  // Build fields for price, quantity, discount, and final price
-  Widget _buildPriceQuantityDiscountFields() {
-    return Obx(() {
-      final selectedArticle = controller.selectedArticle.value;
-
-      return Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          if (selectedArticle != null) ...[
-            // Price field
-            TextField(
-              controller: TextEditingController(text: '${controller.price.value.toStringAsFixed(2)}'),
-              decoration: InputDecoration(
-                labelText: 'Price',
-                labelStyle: TextStyle(
-                  color: Colors.black54, // Default color
-                ),
-                border: OutlineInputBorder(
-                  borderRadius: BorderRadius.circular(12),
-                ),
-                focusedBorder: OutlineInputBorder(
-                  borderRadius: BorderRadius.circular(12),
-                  borderSide: BorderSide(
-                    color: primaryColor,
-                  ),
-                ),
-                enabledBorder: OutlineInputBorder(
-                  borderRadius: BorderRadius.circular(12),
-                  borderSide: BorderSide(
-                    color: Colors.grey,
-                  ),
-                ),
-              ),
-              readOnly: true,
-            ),
-            const SizedBox(height: 16),
-            // Quantity field
-            TextField(
-              focusNode: controller.quantityFocusNode,
-              keyboardType: TextInputType.number,
-              onChanged: (value) {
-                final intValue = int.tryParse(value) ?? 0;
-                if (intValue > selectedArticle.qte) {
-                  controller.showQuantityError(true); // Show error if exceeds
-                } else {
-                  controller.showQuantityError(false);
-                  controller.updateQuantity(intValue);
-                }
-              },
-              decoration: InputDecoration(
-                labelText: 'Quantity',
-                labelStyle: TextStyle(
-                  color: controller.quantityFocusNode.hasFocus ? primaryColor : Colors.black54,
-                ),
-                border: OutlineInputBorder(
-                  borderRadius: BorderRadius.circular(12),
-                ),
-                errorText: controller.quantityError.value.isNotEmpty ? controller.quantityError.value : null,
-                focusedBorder: OutlineInputBorder(
-                  borderRadius: BorderRadius.circular(12),
-                  borderSide: BorderSide(
-                    color: primaryColor,
-                  ),
-                ),
-                enabledBorder: OutlineInputBorder(
-                  borderRadius: BorderRadius.circular(12),
-                  borderSide: BorderSide(
-                    color: Colors.grey,
-                  ),
-                ),
-              ),
-            ),
-            const SizedBox(height: 16),
-            // Discount field
-            TextField(
-              focusNode: controller.discountFocusNode,
-              keyboardType: TextInputType.number,
-              onChanged: (value) {
-                final discountValue = double.tryParse(value) ?? 0.0;
-                controller.updateDiscount(discountValue );
-              },
-              decoration: InputDecoration(
-                labelText: 'Discount (%)',
-                labelStyle: TextStyle(
-                  color: controller.discountFocusNode.hasFocus ? primaryColor : Colors.black54,
-                ),
-                border: OutlineInputBorder(
-                  borderRadius: BorderRadius.circular(12),
-                ),
-                focusedBorder: OutlineInputBorder(
-                  borderRadius: BorderRadius.circular(12),
-                  borderSide: BorderSide(
-                    color: primaryColor,
-                  ),
-                ),
-                enabledBorder: OutlineInputBorder(
-                  borderRadius: BorderRadius.circular(12),
-                  borderSide: BorderSide(
-                    color: Colors.grey,
-                  ),
-                ),
-              ),
-            ),
-            const SizedBox(height: 16),
-            // Final Price field
-            TextField(
-              controller: TextEditingController(text: '${controller.finalPrice.toStringAsFixed(2)}'),
-              decoration: InputDecoration(
-                labelText: 'Final Price',
-                labelStyle: TextStyle(
-                  color: Colors.black54, // Default color
-                ),
-                border: OutlineInputBorder(
-                  borderRadius: BorderRadius.circular(12),
-                ),
-                focusedBorder: OutlineInputBorder(
-                  borderRadius: BorderRadius.circular(12),
-                  borderSide: BorderSide(
-                    color: primaryColor,
-                  ),
-                ),
-                enabledBorder: OutlineInputBorder(
-                  borderRadius: BorderRadius.circular(12),
-                  borderSide: BorderSide(
-                    color: Colors.grey,
-                  ),
-                ),
-              ),
-              readOnly: true,
-            ),
-          ],
-        ],
-      );
-    });
   }
 }

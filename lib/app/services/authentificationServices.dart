@@ -18,14 +18,14 @@ class InvalidPasswordException implements Exception {
 }
 
 class AuthentificationServices {
-
-  Future<int> login(String serviceUsername, String servicePassword) async {
+  Future<String> login(String serviceUsername, String servicePassword) async {
     const String url = "$Odatav4/TICOP_Login?Company=%27PHARMA-TEC%27";
     NTLMClient client = NTLMClient(
       domain: ntlmDomain,
       username: ntlmUsername,
       password: ntlmPassword,
     );
+
     var body = jsonEncode({
       'salespersoncode': serviceUsername,
       'salespersonpsw': servicePassword,
@@ -39,18 +39,26 @@ class AuthentificationServices {
 
     if (response.statusCode == 200) {
       var jsonResponse = jsonDecode(response.body);
-      int value = jsonResponse['value'];
-
-      if (value == 1) {
-        return value; // Success
-      } else if (value == -1) {
-        throw AccountInactiveException("Votre compte est inactif.");
-      } else if (value == -2) {
-        throw InvalidUsernameException("Sales Person invalide.");
-      } else if (value == 0) {
-        throw InvalidPasswordException("Mot de passe invalide.");
+      
+      // Check the type of the 'value' field
+      var value = jsonResponse['value'];
+      if (value is int) {
+        switch (value) {
+          case 1:
+            return "Success"; // Indicate successful login
+          case -1:
+            throw AccountInactiveException("Votre compte est inactif.");
+          case -2:
+            throw InvalidUsernameException("Sales Person invalide.");
+          case 0:
+            throw InvalidPasswordException("Mot de passe invalide.");
+          default:
+            throw Exception("Erreur inconnue: $value");
+        }
+      } else if (value is String) {
+        return value; // Return the string value directly if successful
       } else {
-        throw Exception("Erreur inconnue: $value");
+        throw Exception("Unexpected response format");
       }
     } else {
       throw Exception('Failed to login: ${response.statusCode}');

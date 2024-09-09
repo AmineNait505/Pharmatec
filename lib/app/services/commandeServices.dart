@@ -7,7 +7,7 @@ import 'package:pharmatec/utils/constants.dart';
 class CommandeServices {
   Future<List<Commande>> fetchClients(String clientNumber) async {
     final url = Uri.parse(
-      "http://172.16.8.195:7048/BC240/api/Commande_Pharmatec/commande/v2.0/companies(05bb55d8-f023-ef11-87e9-000c29ee52bb)/commandes?\$filter=Sell_to_Customer_No eq '$clientNumber'"
+      "http://172.16.8.199:7048/BC240/api/Commande_Pharmatec/commande/v2.0/companies(05bb55d8-f023-ef11-87e9-000c29ee52bb)/commandes?\$filter=Sell_to_Customer_No eq '$clientNumber'"
     );
     final client = NTLMClient(
       username: ntlmUsername,
@@ -34,7 +34,7 @@ class CommandeServices {
     // ignore: non_constant_identifier_names
     Future<List<Article>> fetchLines(String DocumentNo) async {
       final url = Uri.parse(
-        "http://172.16.8.195:7048/BC240/api/Ligne_Commande_Pharmatec/LigneCommande/v2.0/companies(05bb55d8-f023-ef11-87e9-000c29ee52bb)/lignescommande?\$filter=DocumentNo eq '$DocumentNo'"
+        "http://172.16.8.199:7048/BC240/api/Ligne_Commande_Pharmatec/LigneCommande/v2.0/companies(05bb55d8-f023-ef11-87e9-000c29ee52bb)/lignescommande?\$filter=DocumentNo eq '$DocumentNo'"
       );
       final client = NTLMClient(
         username: ntlmUsername,

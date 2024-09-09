@@ -17,6 +17,7 @@ dependencies:
   build_runner: ^2.3.2
   json_serializable: ^6.6.1
   shared_preferences: ^2.3.2
+  flutter_launcher_icons: ^0.13.1
 
 dev_dependencies: 
   flutter_lints: 4.0.0
@@ -25,4 +26,11 @@ dev_dependencies:
 
 flutter: 
   uses-material-design: true
+  assets:
+    - assets/images/
+    - assets/sounds/
 
+flutter_icons:
+  android: true
+  ios: true
+  image_path: assets/images/pharmatec.png
