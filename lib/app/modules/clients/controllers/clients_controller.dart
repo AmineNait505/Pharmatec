@@ -11,6 +11,7 @@ class ClientsController extends GetxController {
   var isLoading = true.obs;
   var errorMessage = ''.obs;
   var searchQuery = ''.obs;
+  var secteurCode = ''.obs;
   var clientTypes = <TypeClient>[].obs;
   var selectedClientType = Rx<TypeClient?>(null);
   final ClientServices clientsService = ClientServices();
@@ -18,6 +19,7 @@ class ClientsController extends GetxController {
   @override
   void onInit() {
     fetchClientTypes(); 
+    loadClientData();
     super.onInit();
   }
 
@@ -32,15 +34,20 @@ class ClientsController extends GetxController {
       isLoading.value = false;
     }
   }
+    Future<void> loadClientData() async {
+    final prefs = await SharedPreferences.getInstance();
+   
+    secteurCode.value = prefs.getString('secteur_code') ?? ''; 
+  }
 
   Future<void> fetchClientsByType() async {
     if (selectedClientType.value == null) return;
-
+    print('Territory_Code ${secteurCode.value}');
     isLoading.value = true;
     try {
       final fetchedClients = await clientsService.fetchClientsByType(
         selectedClientType.value!.id,
-        ''
+       secteurCode.value
       );
       clients.assignAll(fetchedClients);
       filteredClients.assignAll(fetchedClients);
@@ -64,18 +71,24 @@ class ClientsController extends GetxController {
     }
   }
 
-  // Save client or contact info and navigate to home page
-  Future<void> saveAndNavigateToHome(Client client, [Client? contact]) async {
-    SharedPreferences prefs = await SharedPreferences.getInstance();
-    
-    // Save client info
-    await prefs.setString('client_id', contact?.id ?? client.id);
-    await prefs.setString('client_name', contact?.nom ?? client.nom);
+ Future<void> saveAndNavigateToHome(Client client, [Client? contact]) async {
+  SharedPreferences prefs = await SharedPreferences.getInstance();
 
-    // Navigate to home page
-    Get.toNamed(Routes.HOME); // Replace '/home' with your home page route
+  await prefs.setString('client_id', client.id);
+  await prefs.setString('client_name', client.nom); 
+
+  if (contact != null) {
+   
+    await prefs.setString('contact_id', contact.id);
+    await prefs.setString('contact_name', contact.nom); 
+  } else {
+   
+    await prefs.remove('contact_id');
+    await prefs.remove('contact_name');
   }
-
+  await prefs.setString('client_business_relation', client.business_relation);
+  Get.toNamed(Routes.HOME);
+}
   void searchClients(String query) {
     searchQuery.value = query;
     if (query.isEmpty) {
@@ -90,5 +103,9 @@ class ClientsController extends GetxController {
         }).toList(),
       );
     }
+  }
+    Future<void> logout() async {
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+    await prefs.clear(); // Clear all saved data
   }
 }

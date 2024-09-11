@@ -17,16 +17,27 @@ class HomeView extends GetView<HomeController> {
         iconTheme: IconThemeData(color: primaryColor),
       ),
       drawer: FractionallySizedBox(
-        widthFactor: 0.25, // Adjust the width as needed
+        widthFactor: 0.25,
         child: Drawer(
           backgroundColor: Colors.white,
           child: Column(
-            mainAxisAlignment: MainAxisAlignment.center, // Center icons vertically
+            mainAxisAlignment: MainAxisAlignment.center,
             children: <Widget>[
-              _buildDrawerIcon(Icons.payment, "Paiement"),
-              SizedBox(height: 20),
-              _buildDrawerIcon(Icons.shopping_cart, "Commande"),
-              SizedBox(height: 20),
+              // Conditionally show "Paiement" and "Commande" icons in the drawer
+              Obx(() {
+                if (controller.clientBusinessRelation.value != "NONE") {
+                  return Column(
+                    children: [
+                      _buildDrawerIcon(Icons.payment, "Paiement"),
+                      SizedBox(height: 20),
+                      _buildDrawerIcon(Icons.shopping_cart, "Commande"),
+                      SizedBox(height: 20),
+                    ],
+                  );
+                } else {
+                  return SizedBox.shrink(); // No icons if business_relation is "NONE"
+                }
+              }),
               _buildDrawerIcon(Icons.location_on, "Visite"),
               SizedBox(height: 20),
               _buildDrawerIcon(Icons.history, "Historique"),
@@ -45,7 +56,9 @@ class HomeView extends GetView<HomeController> {
             Obx(() => Align(
               alignment: Alignment.centerRight,
               child: Text(
-                controller.clientName.value,
+                controller.contactName.value.isNotEmpty
+                    ? controller.contactName.value
+                    : controller.clientName.value,
                 style: TextStyle(
                   color: primaryColor,
                   fontSize: 24,
@@ -57,7 +70,9 @@ class HomeView extends GetView<HomeController> {
             Obx(() => Align(
               alignment: Alignment.centerRight,
               child: Text(
-                "Code Client : ${controller.clientId.value}",
+                controller.contactName.value.isNotEmpty
+                    ? 'Client: ${controller.clientName.value}'
+                    : "Code Client : ${controller.clientId.value}",
                 style: TextStyle(
                   color: primaryColor.withOpacity(0.7),
                   fontSize: 18,
@@ -65,10 +80,24 @@ class HomeView extends GetView<HomeController> {
               ),
             )),
             SizedBox(height: 20),
-            _buildCard(Icons.payment, "Paiement", "View and manage payments."),
-            SizedBox(height: 10),
-            _buildCard(Icons.shopping_cart, "Commande", "Track and manage orders."),
-            SizedBox(height: 10),
+            
+            // Conditionally show "Paiement" and "Commande" cards based on business relation
+            Obx(() {
+              if (controller.clientBusinessRelation.value != "NONE") {
+                return Column(
+                  children: [
+                    _buildCard(Icons.payment, "Paiement", "View and manage payments."),
+                    SizedBox(height: 10),
+                    _buildCard(Icons.shopping_cart, "Commande", "Track and manage orders."),
+                    SizedBox(height: 10),
+                  ],
+                );
+              } else {
+                return SizedBox.shrink(); // No cards if business_relation is "NONE"
+              }
+            }),
+
+            // Other cards
             _buildCard(Icons.location_on, "Visite", "Schedule and track visits."),
             SizedBox(height: 10),
             _buildCard(Icons.history, "Historique", "View order history."),
@@ -108,7 +137,7 @@ class HomeView extends GetView<HomeController> {
         ),
         trailing: Icon(Icons.arrow_forward_ios, color: secondColor),
         onTap: () {
-           Get.toNamed(Routes.COMMANDES);
+          Get.toNamed(Routes.COMMANDES);
         },
       ),
     );

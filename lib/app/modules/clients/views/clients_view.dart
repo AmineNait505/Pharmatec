@@ -2,8 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:pharmatec/app/core/values/colors.dart';
 import 'package:pharmatec/app/data/models/TypeClient.dart';
+import 'package:pharmatec/app/routes/app_pages.dart';
 import '../controllers/clients_controller.dart';
-
 class ClientsView extends GetView<ClientsController> {
   const ClientsView({Key? key}) : super(key: key);
 
@@ -20,6 +20,17 @@ class ClientsView extends GetView<ClientsController> {
         ),
         centerTitle: true,
         elevation: 0,
+        // Add logout button here
+        actions: [
+          IconButton(
+            icon: Icon(Icons.logout, color: Colors.white),
+            onPressed: () async {
+              // Clear session data and navigate to login
+              await controller.logout();
+              Get.offAllNamed(Routes.LOGIN); // Navigate to the login page
+            },
+          ),
+        ],
       ),
       body: Padding(
         padding: const EdgeInsets.all(16.0),
@@ -139,12 +150,11 @@ class ClientsView extends GetView<ClientsController> {
                             ),
                           ),
                           trailing: client.NbrContact == 0
-                              ? Icon(Icons.arrow_forward_ios, color: Colors.grey) // Right arrow if no contacts
-                              : null, // Default expand/collapse arrow if there are contacts
+                              ? Icon(Icons.arrow_forward_ios, color: secondColor) 
+                              : null, 
                           onExpansionChanged: (expanded) {
                             if (expanded) {
                               if (client.NbrContact == 0) {
-                                // Directly navigate to home if no contacts
                                 controller.saveAndNavigateToHome(client);
                               } else if (client.NbrContact > 0 && client.contacts == null) {
                                 // Fetch contacts if available

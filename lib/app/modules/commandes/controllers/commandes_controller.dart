@@ -12,7 +12,7 @@ class CommandesController extends GetxController {
 
   final CommandeServices commandeServices = CommandeServices();
   final clientName = ''.obs;
-  final clientId = ''.obs;
+  final contactId = ''.obs;
 
   @override
   void onInit() {
@@ -20,13 +20,14 @@ class CommandesController extends GetxController {
     loadClientData();
   }
 
-  Future<void> fetchCommandes(String clientNumber) async {
-    if (clientNumber.isEmpty) return; // Check for empty clientNumber
+  Future<void> fetchCommandes(String clientNumber,String ContactNo) async {
+    if (clientNumber.isEmpty) return;
     isLoading.value = true;
     try {
-      final fetchedCommandes = await commandeServices.fetchClients(clientNumber);
+      print('yesser $clientNumber');
+      final fetchedCommandes = await commandeServices.fetchClients(clientNumber,ContactNo);
       commandes.assignAll(fetchedCommandes);
-      searchCommandes(''); // To initialize filteredCommandes with all fetched commandes
+      searchCommandes('');
     } catch (e) {
       errorMessage.value = 'Failed to fetch commandes: $e';
     } finally {
@@ -48,11 +49,12 @@ class CommandesController extends GetxController {
 
   Future<void> loadClientData() async {
     final prefs = await SharedPreferences.getInstance();
-    clientName.value = prefs.getString('client_name') ?? '';
-    clientId.value = prefs.getString('client_id') ?? '';
-
-    if (clientId.isNotEmpty) {
-      await fetchCommandes(clientId.value);
+    clientName.value = prefs.getString('client_business_relation') ?? '';
+    contactId.value = prefs.getString('contact_id') ?? '';
+  
+    if (clientName.isNotEmpty || contactId.isNotEmpty) {
+  print("client business relatio ${clientName.value}");
+      await fetchCommandes(clientName.value,contactId.value);
     }
   }
 

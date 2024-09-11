@@ -37,31 +37,35 @@ class AuthentificationServices {
       body: body,
     );
 
+    // Handle success (status code 200)
     if (response.statusCode == 200) {
       var jsonResponse = jsonDecode(response.body);
-      
-      // Check the type of the 'value' field
+
       var value = jsonResponse['value'];
-      if (value is int) {
-        switch (value) {
-          case 1:
-            return "Success"; // Indicate successful login
-          case -1:
-            throw AccountInactiveException("Votre compte est inactif.");
-          case -2:
-            throw InvalidUsernameException("Sales Person invalide.");
-          case 0:
-            throw InvalidPasswordException("Mot de passe invalide.");
-          default:
-            throw Exception("Erreur inconnue: $value");
+      if (value is String) {
+        if (value == "-2") {
+          // Handle incorrect salesperson code
+          throw InvalidUsernameException("Sales Person invalide.");
+        } else {
+          // Return the code on success
+          return value; // e.g., "S01"
         }
-      } else if (value is String) {
-        return value; // Return the string value directly if successful
       } else {
         throw Exception("Unexpected response format");
       }
-    } else {
-      throw Exception('Failed to login: ${response.statusCode}');
     }
+    // Handle incorrect password (status code 400)
+    else if (response.statusCode == 400) {
+      var errorResponse = jsonDecode(response.body);
+      if (errorResponse['error'] != null && errorResponse['error']['message'] != null) {
+        var errorMessage = errorResponse['error']['message'];
+        if (errorMessage.contains("MP non valide")) {
+          throw InvalidPasswordException("Mot de passe invalide.");
+        }
+      }
+    }
+
+    // Handle any other status codes or unexpected cases
+    throw Exception('Failed to login: ${response.statusCode}');
   }
 }

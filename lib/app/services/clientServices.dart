@@ -47,7 +47,7 @@ class ClientServices{
 }
   Future<List<Client>> fetchClientsByType(String typeClient, String territoryCode) async {
     final url = Uri.parse(
-        '$apiv2/Contact_Pharmatec/Contact/v2.0/companies(05bb55d8-f023-ef11-87e9-000c29ee52bb)/ContactList?\$filter=TypeClient eq \'$typeClient\' and type eq \'Company\'');
+        '$apiv2/Contact_Pharmatec/Contact/v2.0/companies(05bb55d8-f023-ef11-87e9-000c29ee52bb)/ContactList?\$filter=Territory_Code eq \'$territoryCode\' and TypeClient eq \'$typeClient\' and type eq \'Company\'');
     final client = NTLMClient(
       username: ntlmUsername, password: ntlmPassword, domain: ntlmDomain);
 

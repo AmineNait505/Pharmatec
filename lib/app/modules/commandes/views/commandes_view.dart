@@ -222,7 +222,7 @@
         floatingActionButton: FloatingActionButton(
           backgroundColor: secondColor,
           onPressed: () {
-            Get.toNamed(Routes.ADDCOMMANDE);
+            Get.offAndToNamed(Routes.ADDCOMMANDE);
           },
           child: const Icon(Icons.add,color: Colors.white,),
           tooltip: 'Add Lines in the commande',

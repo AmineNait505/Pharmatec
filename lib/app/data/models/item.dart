@@ -16,10 +16,11 @@ class Item {
       qte:json['Inventory'],
       price: json['UnitPrice']);
   }
-  Map<String, dynamic> toJson() => {
-        "No": id,
-        "Name": nom,
-      
-      };
+Map<String, dynamic> toJson() => {
+  "No": id,
+  "Description": nom,
+  "Inventory": qte,
+  "UnitPrice": price,
+};
   int get hashcode => Object.hash(id, nom);
 }

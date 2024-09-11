@@ -3,6 +3,7 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:pharmatec/app/core/values/colors.dart';
+import 'package:pharmatec/app/routes/app_pages.dart';
 import '../controllers/details_controller.dart';
 
 class DetailsView extends GetView<DetailsController> {
@@ -16,7 +17,7 @@ class DetailsView extends GetView<DetailsController> {
         backgroundColor: secondColor,
         title: const Text('Details Commande ',style: TextStyle(color: Colors.white),),
         centerTitle: true,
-        leading: IconButton(icon:Icon(Icons.keyboard_backspace,color: Colors.white,),onPressed: () => Get.back(), ),
+        leading: IconButton(icon:Icon(Icons.keyboard_backspace,color: Colors.white,),onPressed: () => Get.offNamed(Routes.COMMANDES), ),
       ),
       body: Obx(() {
         if (controller.isLoading.value) {
@@ -57,7 +58,7 @@ class DetailsView extends GetView<DetailsController> {
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     Text(
-                      'Article Code : ${article.id}',
+                      'Article Nom : ${article.description}',
                       style: const TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
                     ),
                     const SizedBox(height: 8),

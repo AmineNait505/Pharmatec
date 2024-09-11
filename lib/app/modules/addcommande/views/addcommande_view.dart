@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:pharmatec/app/core/values/colors.dart';
+import 'package:pharmatec/app/routes/app_pages.dart';
 import '../controllers/addcommande_controller.dart';
 
 class AddcommandeView extends GetView<AddcommandeController> {
@@ -34,10 +35,11 @@ class AddcommandeView extends GetView<AddcommandeController> {
         return controller.selectedArticles.isNotEmpty
             ? FloatingActionButton(
                 onPressed: () {
-                  // Action du bouton Continuer
+                  controller.saveSelectedArticles();
+                  Get.toNamed(Routes.NEWCOMMANDE);
                 },
                 backgroundColor: secondColor,
-                child: const Icon(Icons.arrow_forward),
+                child: const Icon(Icons.arrow_forward, color: Colors.white),
               )
             : SizedBox.shrink();
       }),
@@ -236,7 +238,7 @@ class AddcommandeView extends GetView<AddcommandeController> {
               Padding(
                 padding: const EdgeInsets.all(8.0),
                 child: TextField(
-                  onChanged: (value) => controller.filterArticles(value),
+                  onChanged: (value) => controller.fetchArticlesByName(value),
                   decoration: InputDecoration(
                     hintText: 'Rechercher un Article',
                     border: OutlineInputBorder(
@@ -255,12 +257,8 @@ class AddcommandeView extends GetView<AddcommandeController> {
                       subtitle: Row(
                         mainAxisAlignment: MainAxisAlignment.spaceBetween,
                         children: [
-                          Text(
-                            article.id,
-                          ),
-                          Text(
-                            '${article.price.toStringAsFixed(2)} TND',
-                          ),
+                          Text(article.id),
+                          Text('${article.price.toStringAsFixed(2)} TND'),
                           Text(
                             article.qte > 0 ? 'En stock' : 'Rupture de stock',
                             style: TextStyle(

@@ -33,7 +33,7 @@ Future<List<Item>> fetchArticlebyCategories(String categoriesCode) async {
     }
 Future<List<Item>> fetchArticlebyNO(String No) async {
       final url = Uri.parse(
-        "http://172.16.8.199:7048/BC240/api/Item_Pharmatec/item/v2.0/companies(05bb55d8-f023-ef11-87e9-000c29ee52bb)/Items?\$filter=No eq '$No*'"
+        "http://172.16.8.199:7048/BC240/api/Item_Pharmatec/item/v2.0/companies(05bb55d8-f023-ef11-87e9-000c29ee52bb)/Items?\$filter=Description  eq '$No*'"
       );
       final client = NTLMClient(
         username: ntlmUsername,

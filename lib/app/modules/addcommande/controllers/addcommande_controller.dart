@@ -1,10 +1,11 @@
+import 'dart:convert';
+
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:pharmatec/app/data/models/categories.dart';
 import 'package:pharmatec/app/data/models/item.dart';
 import 'package:pharmatec/app/services/categoriesServices.dart';
 import 'package:pharmatec/app/services/articleServices.dart';
-import 'package:pharmatec/app/services/commandeServices.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 class AddcommandeController extends GetxController {
@@ -18,7 +19,7 @@ class AddcommandeController extends GetxController {
   var articles = <Item>[].obs;
   var filteredArticles = <Item>[].obs;
   var selectedArticle = Rx<Item?>(null);
-  var selectedArticles = <Item>[].obs; // List of selected articles
+  var selectedArticles = <Item>[].obs; 
 
   @override
   void onInit() {
@@ -32,12 +33,45 @@ class AddcommandeController extends GetxController {
     articleFocusNode.dispose();
     super.onClose();
   }
+    Future<void> saveSelectedArticles() async {
+    final prefs = await SharedPreferences.getInstance();
+    final List<String> articlesJson = selectedArticles.map((article) => jsonEncode(article.toJson())).toList();
+    await prefs.setStringList('selected_articles', articlesJson);
+  }
+void fetchArticlesByName(String articleName) async {
+  try {
+    isLoading(true);
+    errorMessage('');
+    
+    if (articleName.length >= 2) {  
+      if (selectedCategory.value == null) {
+       
+        final fetchedArticles = await ArticelServices().fetchArticlebyNO(articleName);
+        articles.assignAll(fetchedArticles);
+        filteredArticles.assignAll(fetchedArticles);
+      } else {
+        final fetchedArticles = await ArticelServices().fetchArticlebyCategories(selectedCategory.value!.id);
+        articles.assignAll(fetchedArticles);
+        filteredArticles.assignAll(
+          fetchedArticles.where((article) => article.nom.toLowerCase().contains(articleName.toLowerCase())).toList(),
+        );
+      }
+    } else {
+      filteredArticles.clear();
+    }
+  } catch (e) {
+    errorMessage(e.toString());
+  } finally {
+    isLoading(false);
+  }
+}
+
 
   Future<void> fetchCategories() async {
     try {
       isLoading(true);
       errorMessage('');
-      final fetchedCategories = await CategorieServices().fetchClients();
+      final fetchedCategories = await CategorieServices().fetchCategories();
       categories.assignAll(fetchedCategories);
       filteredCategories.assignAll(fetchedCategories);
     } catch (e) {
@@ -84,7 +118,8 @@ class AddcommandeController extends GetxController {
   void selectCategory(Categorie category) {
     if (selectedCategory.value == category) {
       selectedCategory.value = null;
-      filteredArticles.clear(); // Clear articles when category is deselected
+      filteredArticles.clear(); 
+      selectedArticle.value =null;
     } else {
       selectedCategory.value = category;
       fetchArticles(category.id);
@@ -103,30 +138,4 @@ class AddcommandeController extends GetxController {
     }
   }
 
-  /*void submitOrder() async {
-    if (selectedArticles.isEmpty) {
-      Get.snackbar('Error', 'Please select at least one article.',
-          backgroundColor: Colors.red, colorText: Colors.white,
-          snackPosition: SnackPosition.BOTTOM);
-      return;
-    }
-
-    // Implement order submission logic here
-    // Example:
-    final result = await CommandeServices().createOrderLine(
-      // Your order line creation logic here
-    );
-
-    if (result.startsWith('Success')) {
-      Get.snackbar('Success', result,
-          backgroundColor: Colors.green, colorText: Colors.white,
-          snackPosition: SnackPosition.BOTTOM);
-
-      selectedArticles.clear(); // Clear selected articles after submission
-    } else {
-      Get.snackbar('Error', result,
-          backgroundColor: Colors.red, colorText: Colors.white,
-          snackPosition: SnackPosition.BOTTOM);
-    }
-  }*/
 }

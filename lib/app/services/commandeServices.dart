@@ -5,9 +5,9 @@ import 'package:pharmatec/app/data/models/commande.dart';
 import 'package:pharmatec/utils/constants.dart';
 
 class CommandeServices {
-  Future<List<Commande>> fetchClients(String clientNumber) async {
+  Future<List<Commande>> fetchClients(String clientNumber,String ContactNo) async {
     final url = Uri.parse(
-      "http://172.16.8.199:7048/BC240/api/Commande_Pharmatec/commande/v2.0/companies(05bb55d8-f023-ef11-87e9-000c29ee52bb)/commandes?\$filter=Sell_to_Customer_No eq '$clientNumber'"
+      "http://172.16.8.199:7048/BC240/api/Commande_Pharmatec/commande/v2.0/companies(05bb55d8-f023-ef11-87e9-000c29ee52bb)/commandes?\$filter=Sell_to_Customer_No eq '$clientNumber' and contactNo eq '$ContactNo**'"
     );
     final client = NTLMClient(
       username: ntlmUsername,
@@ -18,7 +18,7 @@ class CommandeServices {
     try {
       final response = await client.get(url);
       print(response.body);
-      print(response.body);
+      print('coomandde header ${response.body }');
       if (response.statusCode == 200) {
         final data = jsonDecode(response.body);
         final List<dynamic> clientsJson = data['value'];
@@ -59,16 +59,19 @@ class CommandeServices {
     }
     Future<String> createOrderLine({
   required String clientNo,
- 
   required String itemNo,
   required String qty,
   required String salespersonCode,
+  required String ContactNo,
+  required int  remise
 }) async {
-  final url = 'http://172.16.8.196:7048/BC240/api/OrderLine_Pharmatec/Order/v2.0/companies(05bb55d8-f023-ef11-87e9-000c29ee52bb)/OrderLines';
+  const url = '$apiv2/OrderLine_Pharmatec/Order/v2.0/companies(05bb55d8-f023-ef11-87e9-000c29ee52bb)/OrderLines';
   
   final body = jsonEncode({
     'clientNo': clientNo,
     'headerNo': "",
+    'contactNo':ContactNo,
+    'remise':remise,
     'itemNo': itemNo,
     'qty': qty,
     'salespersoncode': salespersonCode,
@@ -90,8 +93,10 @@ class CommandeServices {
       body: body,
     );
     print(response.body);
-    if (response.statusCode == 201) {
-      return 'Success: Order line created.';
+ if (response.statusCode == 201) {
+      final responseData = jsonDecode(response.body);
+      final headerNo = responseData['headerNo'] ?? 'Unknown headerNo';
+      return headerNo;
     } else {
       final errorResponse = jsonDecode(response.body);
       final errorMessage = errorResponse['error']['message'] ?? 'Unknown error';

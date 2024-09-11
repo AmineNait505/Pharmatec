@@ -33,7 +33,10 @@ class LoginController extends GetxController {
     final prefs = await SharedPreferences.getInstance();
     await prefs.setString('salesperson', email);
   }
-
+  Future<void> _saveSecteurCode(String secteurCode) async {
+  SharedPreferences prefs = await SharedPreferences.getInstance();
+  await prefs.setString('secteur_code', secteurCode);
+}
   Future<void> onLoginPressed() async {
     isLoading.value = true;
     emailError.value = '';
@@ -41,9 +44,11 @@ class LoginController extends GetxController {
 
     try {
       Future.delayed(Duration(seconds: 3)); 
-      await authService.login(email.value, password.value);
+      String secteurCode = await authService.login(email.value, password.value);
       print(email.value);
       await _saveSalespersonInfo(email.value);
+      print("Secteur $secteurCode");
+      await _saveSecteurCode(secteurCode);
       Get.snackbar('Succès', 'Connexion réussie !',
           backgroundColor: Colors.green, colorText: Colors.white,
           snackPosition: SnackPosition.BOTTOM,);
