@@ -14,6 +14,8 @@ import '../modules/login/bindings/login_binding.dart';
 import '../modules/login/views/login_view.dart';
 import '../modules/newcommande/bindings/newcommande_binding.dart';
 import '../modules/newcommande/views/newcommande_view.dart';
+import '../modules/status/bindings/status_binding.dart';
+import '../modules/status/views/status_view.dart';
 
 part 'app_routes.dart';
 
@@ -57,6 +59,11 @@ class AppPages {
       name: _Paths.NEWCOMMANDE,
       page: () => const NewcommandeView(),
       binding: NewcommandeBinding(),
+    ),
+    GetPage(
+      name: _Paths.STATUS,
+      page: () => const StatusView(),
+      binding: StatusBinding(),
     ),
   ];
 }
