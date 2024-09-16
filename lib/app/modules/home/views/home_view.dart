@@ -23,26 +23,26 @@ class HomeView extends GetView<HomeController> {
           child: Column(
             mainAxisAlignment: MainAxisAlignment.center,
             children: <Widget>[
-              // Conditionally show "Paiement" and "Commande" icons in the drawer
+              // Conditional icons in the drawer
               Obx(() {
                 if (controller.clientBusinessRelation.value != "NONE") {
                   return Column(
                     children: [
-                      _buildDrawerIcon(Icons.payment, "Paiement"),
+                      _buildDrawerIcon(Icons.payment, "Paiement", Routes.COMMANDES),
                       SizedBox(height: 20),
-                      _buildDrawerIcon(Icons.shopping_cart, "Commande"),
+                      _buildDrawerIcon(Icons.shopping_cart, "Commande", Routes.COMMANDES),
                       SizedBox(height: 20),
                     ],
                   );
                 } else {
-                  return SizedBox.shrink(); // No icons if business_relation is "NONE"
+                  return SizedBox.shrink(); // Hide icons if no business relation
                 }
               }),
-              _buildDrawerIcon(Icons.location_on, "Visite"),
+              _buildDrawerIcon(Icons.location_on, "Visite", Routes.COMMANDES),
               SizedBox(height: 20),
-              _buildDrawerIcon(Icons.history, "Historique"),
+              _buildDrawerIcon(Icons.history, "Historique", Routes.COMMANDES),
               SizedBox(height: 20),
-              _buildDrawerIcon(Icons.info, "Situation"),
+              _buildDrawerIcon(Icons.info, "Situation", Routes.STATUS),
             ],
           ),
         ),
@@ -79,37 +79,67 @@ class HomeView extends GetView<HomeController> {
                 ),
               ),
             )),
+            SizedBox(height: 10),
+            
+           Obx(() {
+  if (controller.clientStatus.isNotEmpty && controller.clientStatus.first.cause_blocage?.isNotEmpty == true) {
+    return Align(
+      alignment: Alignment.centerRight, // Align the entire row to the right
+      child: Row(
+        mainAxisSize: MainAxisSize.min, // Makes the row take only as much space as needed
+        children: [
+          // Add spacing between the text and the icon
+          Icon(Icons.warning, color: Colors.red),
+            SizedBox(width: 8),
+          Text(
+            controller.clientStatus.first.cause_blocage ?? '',
+            style: TextStyle(
+              color: Colors.red,
+              fontSize: 16,
+              fontWeight: FontWeight.bold,
+            ),
+          ),
+         
+        ],
+      ),
+    );
+  } else {
+    return SizedBox.shrink(); // No "cause blocage" displayed if it's empty
+  }
+}),
+
+            
             SizedBox(height: 20),
             
-            // Conditionally show "Paiement" and "Commande" cards based on business relation
+            // Conditional display of "Paiement" and "Commande" cards
             Obx(() {
               if (controller.clientBusinessRelation.value != "NONE") {
                 return Column(
                   children: [
-                    _buildCard(Icons.payment, "Paiement", "View and manage payments."),
+                    _buildCard(Icons.payment, "Paiement", "Voir et gérer les paiements.", Routes.COMMANDES),
                     SizedBox(height: 10),
-                    _buildCard(Icons.shopping_cart, "Commande", "Track and manage orders."),
+                    _buildCard(Icons.shopping_cart, "Commande / Devis", "Suivre et gérer les commandes.", Routes.COMMANDES),
                     SizedBox(height: 10),
                   ],
                 );
               } else {
-                return SizedBox.shrink(); // No cards if business_relation is "NONE"
+                return SizedBox.shrink(); // Hide cards if no business relation
               }
             }),
 
             // Other cards
-            _buildCard(Icons.location_on, "Visite", "Schedule and track visits."),
+            _buildCard(Icons.location_on, "Visite", "Planifier et suivre les visites.", Routes.COMMANDES),
             SizedBox(height: 10),
-            _buildCard(Icons.history, "Historique", "View order history."),
+            _buildCard(Icons.history, "Historique", "Voir l'historique des commandes.", Routes.COMMANDES),
             SizedBox(height: 10),
-            _buildCard(Icons.info, "Situation", "Check the current situation."),
+            _buildCard(Icons.info, "Situation", "Vérifier la situation actuelle.", Routes.STATUS),
           ],
         ),
       ),
     );
   }
 
-  Widget _buildCard(IconData icon, String title, String description) {
+  Widget _buildCard(IconData icon, String title, String description, String route) {
     return Card(
       elevation: 5,
       shape: RoundedRectangleBorder(
@@ -137,17 +167,17 @@ class HomeView extends GetView<HomeController> {
         ),
         trailing: Icon(Icons.arrow_forward_ios, color: secondColor),
         onTap: () {
-          Get.toNamed(Routes.COMMANDES);
+          Get.toNamed(route); // Navigate to the appropriate route
         },
       ),
     );
   }
 
-  Widget _buildDrawerIcon(IconData icon, String label) {
+  Widget _buildDrawerIcon(IconData icon, String label, String route) {
     return IconButton(
       icon: Icon(icon, color: secondColor),
       onPressed: () {
-        Get.toNamed(Routes.COMMANDES);
+        Get.toNamed(route); // Navigate to the appropriate route
       },
     );
   }

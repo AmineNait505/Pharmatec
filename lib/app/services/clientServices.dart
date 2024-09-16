@@ -3,6 +3,7 @@ import 'dart:convert';
 import 'package:ntlm/ntlm.dart';
 import 'package:pharmatec/app/data/models/TypeClient.dart';
 import 'package:pharmatec/app/data/models/client.dart';
+import 'package:pharmatec/app/data/models/clientStatus.dart';
 import 'package:pharmatec/utils/constants.dart';
 
 class ClientServices{
@@ -83,6 +84,27 @@ class ClientServices{
       throw Exception('Failed to fetch contacts');
     }
   }
+    Future<List<ClientStatus>> fetchClientStatus(String clientId) async {
+    final url = Uri.parse(
+        '$apiv2/Pharma_tec/customer/v2.0/companies(05bb55d8-f023-ef11-87e9-000c29ee52bb)/Customers?\$filter=No eq \'$clientId\'');
+       final client = NTLMClient(
+      username: ntlmUsername, password: ntlmPassword, domain: ntlmDomain);
 
+    try {
+
+      final response = await client.get(url);
+      if (response.statusCode == 200) {
+        final data = jsonDecode(response.body);
+        final List<dynamic> statusJson = data['value'];
+        return clientStatusFromJson(statusJson);
+      } else {
+        throw Exception('Failed to load client status');
+      }
+    } catch (e) {
+      print('Error: $e');
+      throw Exception('Failed to load client status');
+    }
+  }
 }
+
 

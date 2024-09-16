@@ -1,23 +1,33 @@
 import 'package:get/get.dart';
+import 'package:pharmatec/app/data/models/clientStatus.dart';
+import 'package:pharmatec/app/services/clientServices.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 class StatusController extends GetxController {
-  //TODO: Implement StatusController
+  var clientId = ''.obs;
+  var clientStatus = <ClientStatus>[].obs;
 
-  final count = 0.obs;
   @override
   void onInit() {
     super.onInit();
+    loadClientData();
   }
 
-  @override
-  void onReady() {
-    super.onReady();
+  Future<void> loadClientData() async {
+    final prefs = await SharedPreferences.getInstance();
+    clientId.value = prefs.getString('client_id') ?? 'Unknown';
+
+    if (clientId.isNotEmpty) {
+      await fetchClientStatus();
+    }
   }
 
-  @override
-  void onClose() {
-    super.onClose();
+  Future<void> fetchClientStatus() async {
+    try {
+      var status = await ClientServices().fetchClientStatus(clientId.value);
+      clientStatus.assignAll(status);
+    } catch (e) {
+      print('Error fetching client status: $e');
+    }
   }
-
-  void increment() => count.value++;
 }

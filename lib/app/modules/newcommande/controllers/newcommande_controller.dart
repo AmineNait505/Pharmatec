@@ -19,6 +19,7 @@ class NewcommandeController extends GetxController {
   final salesPerson = ''.obs;
   final contactId = ''.obs;
   final clientBusinessRelation = ''.obs;
+  final causeBlocage = ''.obs;
 
   final CommandeServices commandeServices = CommandeServices();
 
@@ -42,6 +43,7 @@ class NewcommandeController extends GetxController {
     salesPerson.value = prefs.getString('salesperson') ?? '';
     clientBusinessRelation.value = prefs.getString('client_business_relation') ?? 'Unknown';
     contactId.value = prefs.getString('contact_id') ?? ''; 
+    causeBlocage.value=prefs.getString('cause_bloacage') ?? '';
   }
 
   void validateQuantity(Item item, int newQuantity) {
@@ -85,8 +87,16 @@ class NewcommandeController extends GetxController {
   Future<void> submitOrder() async {
     try {
       String? lastHeaderNo;
+      String documentType;
+      if(causeBlocage.value==''){
+        documentType="Order";
+      }else{
+        documentType ='Blanket Order';
+      }
       for (var article in selectedArticles) {
+        print("si khairi $documentType");
         final headerNo = await commandeServices.createOrderLine(
+          documentType: documentType,
           clientNo: clientBusinessRelation.value,
           itemNo: article.id,
           qty: enteredQuantities[article.hashCode]!.toString(),

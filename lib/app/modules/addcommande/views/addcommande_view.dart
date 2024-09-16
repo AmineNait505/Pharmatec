@@ -12,7 +12,7 @@ class AddcommandeView extends GetView<AddcommandeController> {
     return Scaffold(
       appBar: AppBar(
         backgroundColor: secondColor,
-        title: const Text('Ajouter au Commande', style: TextStyle(color: Colors.white)),
+        title: const Text('Ajouter à la Commande', style: TextStyle(color: Colors.white)),
         centerTitle: true,
         leading: IconButton(
           icon: Icon(Icons.arrow_back, color: Colors.white),

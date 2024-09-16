@@ -13,6 +13,7 @@ class CommandesController extends GetxController {
   final CommandeServices commandeServices = CommandeServices();
   final clientName = ''.obs;
   final contactId = ''.obs;
+  var isMenuOpen=false.obs;
 
   @override
   void onInit() {
