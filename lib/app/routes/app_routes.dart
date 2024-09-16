@@ -11,6 +11,8 @@ abstract class Routes {
   static const ADDCOMMANDE = _Paths.ADDCOMMANDE;
   static const NEWCOMMANDE = _Paths.NEWCOMMANDE;
   static const STATUS = _Paths.STATUS;
+  static const CALENDAR = _Paths.CALENDAR;
+  static const VISITE = _Paths.VISITE;
 }
 
 abstract class _Paths {
@@ -23,4 +25,6 @@ abstract class _Paths {
   static const ADDCOMMANDE = '/addcommande';
   static const NEWCOMMANDE = '/newcommande';
   static const STATUS = '/status';
+  static const CALENDAR = '/calendar';
+  static const VISITE = '/visite';
 }

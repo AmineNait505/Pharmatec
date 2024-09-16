@@ -2,6 +2,8 @@ import 'package:get/get.dart';
 
 import '../modules/addcommande/bindings/addcommande_binding.dart';
 import '../modules/addcommande/views/addcommande_view.dart';
+import '../modules/calendar/bindings/calendar_binding.dart';
+import '../modules/calendar/views/calendar_view.dart';
 import '../modules/clients/bindings/clients_binding.dart';
 import '../modules/clients/views/clients_view.dart';
 import '../modules/commandes/bindings/commandes_binding.dart';
@@ -16,6 +18,8 @@ import '../modules/newcommande/bindings/newcommande_binding.dart';
 import '../modules/newcommande/views/newcommande_view.dart';
 import '../modules/status/bindings/status_binding.dart';
 import '../modules/status/views/status_view.dart';
+import '../modules/visite/bindings/visite_binding.dart';
+import '../modules/visite/views/visite_view.dart';
 
 part 'app_routes.dart';
 
@@ -64,6 +68,16 @@ class AppPages {
       name: _Paths.STATUS,
       page: () => const StatusView(),
       binding: StatusBinding(),
+    ),
+    GetPage(
+      name: _Paths.CALENDAR,
+      page: () => const CalendarView(),
+      binding: CalendarBinding(),
+    ),
+    GetPage(
+      name: _Paths.VISITE,
+      page: () => const VisiteView(),
+      binding: VisiteBinding(),
     ),
   ];
 }
