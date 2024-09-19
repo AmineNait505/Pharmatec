@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:pharmatec/app/core/values/colors.dart';
+import 'package:pharmatec/app/routes/app_pages.dart';
 import '../controllers/status_controller.dart';
 
 class StatusView extends GetView<StatusController> {
@@ -30,30 +31,53 @@ class StatusView extends GetView<StatusController> {
             return SingleChildScrollView(
               child: Column(
                 children: [
+                  // Solde card with a pop-up action
                   _buildStatusCard(
                     'Solde:',
                     status.solde.toStringAsFixed(2),
                     status.solde > 0 ? Colors.green.shade100 : Colors.red.shade100,
+                    () => _showSoldePopup(context, status.solde), // Custom action for Solde
                   ),
+                  
+                  // Solde Échu card
                   _buildStatusCard(
                     'Solde Échu:',
                     status.soldeEchu.toStringAsFixed(2),
                     Colors.white,
+                    () {
+                      // Custom action for Solde Échu (e.g., show another dialog)
+                      _showGenericPopup(context, 'Solde Échu', status.soldeEchu);
+                    },
                   ),
+                  
+                  // Paiement en Cours card
                   _buildStatusCard(
                     'Paiement en Cours:',
                     status.payementEnCours.toStringAsFixed(2),
                     Colors.white,
+                    () {
+                      // Custom action for Paiement en Cours
+                      _showGenericPopup(context, 'Paiement en Cours', status.payementEnCours);
+                    },
                   ),
+                  
+                  // Commande en Cours card (navigate to the COMMANDE page)
                   _buildStatusCard(
                     'Commande en Cours:',
                     status.commandeEnCours.toStringAsFixed(2),
                     Colors.white,
+                    () => Get.toNamed(Routes.COMMANDES), // Navigate to Commande page
                   ),
+                  
+                  // Restant card
                   _buildStatusCard(
                     'Restant:',
                     status.restant.toStringAsFixed(2),
                     Colors.white,
+                    () {
+                      // Custom action for Restant
+                      _showGenericPopup(context, 'Restant', status.restant);
+                    },
                   ),
                 ],
               ),
@@ -64,7 +88,8 @@ class StatusView extends GetView<StatusController> {
     );
   }
 
-  Widget _buildStatusCard(String label, String value, Color backgroundColor) {
+  // Build Status Card with custom onTap actions
+  Widget _buildStatusCard(String label, String value, Color backgroundColor, VoidCallback onTap) {
     return Card(
       margin: const EdgeInsets.symmetric(vertical: 8.0),
       elevation: 4,
@@ -95,7 +120,30 @@ class StatusView extends GetView<StatusController> {
             color: backgroundColor == Colors.white ? Colors.black : Colors.white,
           ),
         ),
+        onTap: onTap, // Execute the provided action when the card is tapped
       ),
+    );
+  }
+
+  // Function to show the Solde pop-up
+  void _showSoldePopup(BuildContext context, double solde) {
+    Get.defaultDialog(
+      title: 'Solde Information',
+      middleText: 'Le solde actuel est: ${solde.toStringAsFixed(2)}',
+      textConfirm: 'OK',
+      confirmTextColor: Colors.white,
+      onConfirm: () => Get.back(),
+    );
+  }
+
+  // Generic pop-up function for other cards
+  void _showGenericPopup(BuildContext context, String title, double value) {
+    Get.defaultDialog(
+      title: '$title Information',
+      middleText: 'La valeur actuelle est: ${value.toStringAsFixed(2)}',
+      textConfirm: 'OK',
+      confirmTextColor: Colors.white,
+      onConfirm: () => Get.back(),
     );
   }
 }

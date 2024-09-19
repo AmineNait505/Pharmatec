@@ -46,7 +46,7 @@ class AppPages {
     ),
     GetPage(
       name: _Paths.COMMANDES,
-      page: () => const CommandesView(),
+      page: () =>  CommandesView(),
       binding: CommandesBinding(),
     ),
     GetPage(

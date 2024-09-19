@@ -9,6 +9,8 @@ class AddcommandeView extends GetView<AddcommandeController> {
 
   @override
   Widget build(BuildContext context) {
+    final bool isQuote = Get.arguments['isQuote'] ?? false;
+    final bool isIndirect = Get.arguments['isIndirect'] ?? false;
     return Scaffold(
       appBar: AppBar(
         backgroundColor: secondColor,
@@ -36,7 +38,7 @@ class AddcommandeView extends GetView<AddcommandeController> {
             ? FloatingActionButton(
                 onPressed: () {
                   controller.saveSelectedArticles();
-                  Get.toNamed(Routes.NEWCOMMANDE);
+                  Get.toNamed(Routes.NEWCOMMANDE,arguments: {'isQuote': isQuote,'isIndirect':isIndirect});
                 },
                 backgroundColor: secondColor,
                 child: const Icon(Icons.arrow_forward, color: Colors.white),

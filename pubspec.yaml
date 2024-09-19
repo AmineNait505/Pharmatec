@@ -19,6 +19,11 @@ dependencies:
   shared_preferences: ^2.3.2
   flutter_launcher_icons: ^0.13.1
   flutter_speed_dial: ^7.0.0
+  flutter_event_calendar: ^1.0.0
+  table_calendar: ^3.1.2
+  flutter_expandable_fab: ^2.3.0
+  circular_menu: ^4.0.0
+  
 
 dev_dependencies: 
   flutter_lints: 4.0.0

@@ -38,7 +38,10 @@ class HomeView extends GetView<HomeController> {
                   return SizedBox.shrink(); // Hide icons if no business relation
                 }
               }),
-              _buildDrawerIcon(Icons.location_on, "Visite", Routes.COMMANDES),
+              _buildDrawerIcon(Icons.shop_2, "Commande Indirect", Routes.ADDCOMMANDE,),
+              _buildDrawerIcon(Icons.location_on, "Visite", Routes.VISITE, arguments: {
+                'from': Routes.HOME, 
+              }),
               SizedBox(height: 20),
               _buildDrawerIcon(Icons.history, "Historique", Routes.COMMANDES),
               SizedBox(height: 20),
@@ -81,37 +84,38 @@ class HomeView extends GetView<HomeController> {
             )),
             SizedBox(height: 10),
             
-           Obx(() {
-  if (controller.clientStatus.isNotEmpty && controller.clientStatus.first.cause_blocage?.isNotEmpty == true) {
+          Obx(() {
+  if (controller.clientStatus.isNotEmpty && controller.clientStatus.first.cause_blocage != 'Non bloqué') {
     return Align(
-      alignment: Alignment.centerRight, // Align the entire row to the right
-      child: Row(
-        mainAxisSize: MainAxisSize.min, // Makes the row take only as much space as needed
-        children: [
-          // Add spacing between the text and the icon
-          Icon(Icons.warning, color: Colors.red),
+      alignment: Alignment.centerRight,
+      child: InkWell(  // InkWell adds a ripple effect when clicked
+        onTap: () {
+          Get.toNamed(Routes.STATUS);
+        },
+        child: Row(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            Icon(Icons.warning, color: Colors.red),
             SizedBox(width: 8),
-          Text(
-            controller.clientStatus.first.cause_blocage ?? '',
-            style: TextStyle(
-              color: Colors.red,
-              fontSize: 16,
-              fontWeight: FontWeight.bold,
+            Text(
+              controller.clientStatus.first.cause_blocage ?? '',
+              style: TextStyle(
+                color: Colors.red,
+                fontSize: 16,
+                fontWeight: FontWeight.bold,
+              ),
             ),
-          ),
-         
-        ],
+          ],
+        ),
       ),
     );
   } else {
-    return SizedBox.shrink(); // No "cause blocage" displayed if it's empty
+    return SizedBox.shrink(); 
   }
 }),
 
-            
             SizedBox(height: 20),
-            
-            // Conditional display of "Paiement" and "Commande" cards
+           
             Obx(() {
               if (controller.clientBusinessRelation.value != "NONE") {
                 return Column(
@@ -126,9 +130,16 @@ class HomeView extends GetView<HomeController> {
                 return SizedBox.shrink(); // Hide cards if no business relation
               }
             }),
-
+            _buildCard(Icons.shop_2, "Commande Indirect", "Suivre et gérer les commandes Indirect.", Routes.ADDCOMMANDE,
+            arguments: {'isQuote':false,
+            'isIndirect':true}),
+            SizedBox(height: 10),
             // Other cards
-            _buildCard(Icons.location_on, "Visite", "Planifier et suivre les visites.", Routes.COMMANDES),
+            _buildCard(Icons.location_on, "Visite", "Planifier et suivre les visites.", Routes.CALENDAR, arguments: {
+              'clientNo': controller.clientId.value,
+              'contactNo': controller.contactId.value,
+              'from': Get.currentRoute, 
+            }),
             SizedBox(height: 10),
             _buildCard(Icons.history, "Historique", "Voir l'historique des commandes.", Routes.COMMANDES),
             SizedBox(height: 10),
@@ -139,7 +150,7 @@ class HomeView extends GetView<HomeController> {
     );
   }
 
-  Widget _buildCard(IconData icon, String title, String description, String route) {
+  Widget _buildCard(IconData icon, String title, String description, String route, {Map<String, dynamic>? arguments}) {
     return Card(
       elevation: 5,
       shape: RoundedRectangleBorder(
@@ -167,17 +178,17 @@ class HomeView extends GetView<HomeController> {
         ),
         trailing: Icon(Icons.arrow_forward_ios, color: secondColor),
         onTap: () {
-          Get.toNamed(route); // Navigate to the appropriate route
+          Get.toNamed(route, arguments: arguments); // Pass arguments during navigation
         },
       ),
     );
   }
 
-  Widget _buildDrawerIcon(IconData icon, String label, String route) {
+  Widget _buildDrawerIcon(IconData icon, String label, String route, {Map<String, String>? arguments}) {
     return IconButton(
       icon: Icon(icon, color: secondColor),
       onPressed: () {
-        Get.toNamed(route); // Navigate to the appropriate route
+        Get.toNamed(route, arguments: arguments); // Pass arguments during navigation
       },
     );
   }

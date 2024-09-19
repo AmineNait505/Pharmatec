@@ -20,6 +20,10 @@ class NewcommandeController extends GetxController {
   final contactId = ''.obs;
   final clientBusinessRelation = ''.obs;
   final causeBlocage = ''.obs;
+  final solde=0.0.obs;
+  var isQuote = false.obs;
+  var isIndirect = false.obs;
+  var  total = 0.0.obs;
 
   final CommandeServices commandeServices = CommandeServices();
 
@@ -27,7 +31,13 @@ class NewcommandeController extends GetxController {
   void onInit() {
     super.onInit();
     loadSelectedArticles();
-    loadClientData();
+    
+    // Initialize isQuote and isIndirect from Get.arguments
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      isQuote.value = Get.arguments['isQuote'] ?? false;
+      isIndirect.value = Get.arguments['isIndirect'] ?? false;
+      loadClientData();
+    });
   }
 
   Future<void> loadSelectedArticles() async {
@@ -43,7 +53,9 @@ class NewcommandeController extends GetxController {
     salesPerson.value = prefs.getString('salesperson') ?? '';
     clientBusinessRelation.value = prefs.getString('client_business_relation') ?? 'Unknown';
     contactId.value = prefs.getString('contact_id') ?? ''; 
-    causeBlocage.value=prefs.getString('cause_bloacage') ?? '';
+    causeBlocage.value=prefs.getString('cause_bloacage') ?? ' ';
+    solde.value=prefs.getDouble('solde') ?? 0.0;
+    print("solde ${solde.value}");
   }
 
   void validateQuantity(Item item, int newQuantity) {
@@ -72,29 +84,65 @@ class NewcommandeController extends GetxController {
     return discountErrors[item.hashCode];
   }
 
-  // Function to calculate total price
   double calculateTotalPrice() {
-    double total = 0.0;
-    for (var article in selectedArticles) {
-      int quantity = enteredQuantities[article.hashCode] ?? 0;
-      double discount = (enteredDiscounts[article.hashCode] ?? 0) / 100;
-      total += quantity * article.price * (1 - discount);
-    }
-    return total;
+    total.value = 0.0;
+  for (var article in selectedArticles) {
+    int quantity = enteredQuantities[article.hashCode] ?? 0;
+    double discount = (enteredDiscounts[article.hashCode] ?? 0) / 100;
+    total.value += quantity * article.price * (1 - discount);
   }
+  total.value *= 1.19;
+  
+  return total.value;
+}
 
-  // Function to submit the order
   Future<void> submitOrder() async {
     try {
       String? lastHeaderNo;
       String documentType;
-      if(causeBlocage.value==''){
-        documentType="Order";
+
+      // Use isQuote and isIndirect from the controller
+      if (isQuote.value) {
+        documentType = 'Quote';
+      } else if (isIndirect.value) {
+        print("AMINE NAIT SLIMEN ${isIndirect.value}");
+        for (var article in selectedArticles) {
+          final result = await commandeServices.createCommandeIndirecte(
+            noContact: contactId.value,
+            noCommercial: salesPerson.value,
+            noArticle: article.id,
+            qty: enteredQuantities[article.hashCode]!,
+          );
+
+          if (result.startsWith('Error')) {
+            Get.snackbar(
+              'Erreur',
+              'Une erreur s\'est produite lors de la création de la commande indirecte.',
+              snackPosition: SnackPosition.BOTTOM,
+              backgroundColor: Colors.red,
+              colorText: Colors.white,
+            );
+            return;
+          }
+
+          Get.snackbar(
+            'Succès',
+            'La commande indirecte a été créée avec succès.',
+            snackPosition: SnackPosition.BOTTOM,
+            backgroundColor: Colors.green,
+            colorText: Colors.white,
+          );
+          Get.offNamed(Routes.CALENDAR);
+          return;
+        }
+        return;
+      } else if(causeBlocage.value != 'Non bloqué' || total.value>=solde.value) {
+        documentType = 'Blanket Order';
       }else{
-        documentType ='Blanket Order';
+        documentType = 'Order';
       }
+
       for (var article in selectedArticles) {
-        print("si khairi $documentType");
         final headerNo = await commandeServices.createOrderLine(
           documentType: documentType,
           clientNo: clientBusinessRelation.value,
@@ -105,9 +153,14 @@ class NewcommandeController extends GetxController {
           remise: enteredDiscounts[article.hashCode] ?? 0,
         );
 
-        if (headerNo == 'Unknown headerNo' || headerNo.startsWith('Error')) {
-          Get.snackbar('Erreur', 'Une erreur s\'est produite lors de la création de la ligne de commande.',
-            snackPosition: SnackPosition.BOTTOM, backgroundColor: Colors.red, colorText: Colors.white);
+        if (headerNo.startsWith('Error') || headerNo == 'Unknown headerNo') {
+          Get.snackbar(
+            'Erreur',
+            'Une erreur s\'est produite lors de la création de la ligne de commande.',
+            snackPosition: SnackPosition.BOTTOM,
+            backgroundColor: Colors.red,
+            colorText: Colors.white,
+          );
           return;
         }
         lastHeaderNo = headerNo;
@@ -117,13 +170,26 @@ class NewcommandeController extends GetxController {
         final prefs = await SharedPreferences.getInstance();
         await prefs.setString('selected_commande_no', lastHeaderNo);
 
-        Get.snackbar('Succès', 'La commande a été créée avec succès.',
-          snackPosition: SnackPosition.BOTTOM, backgroundColor: Colors.green, colorText: Colors.white);
+        Get.snackbar(
+          'Succès',
+          isQuote.value
+              ? 'Le devis a été créé avec succès.'
+              : 'La commande a été créée avec succès.',
+          snackPosition: SnackPosition.BOTTOM,
+          backgroundColor: Colors.green,
+          colorText: Colors.white,
+        );
         Get.offNamed(Routes.DETAILS);
       }
+
     } catch (e) {
-      Get.snackbar('Erreur', 'Une erreur s\'est produite: ${e.toString()}',
-        snackPosition: SnackPosition.BOTTOM, backgroundColor: Colors.red, colorText: Colors.white);
+      Get.snackbar(
+        'Erreur',
+        'Une erreur s\'est produite: ${e.toString()}',
+        snackPosition: SnackPosition.BOTTOM,
+        backgroundColor: Colors.red,
+        colorText: Colors.white,
+      );
     }
   }
 }

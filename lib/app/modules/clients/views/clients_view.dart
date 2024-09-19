@@ -20,7 +20,11 @@ class ClientsView extends GetView<ClientsController> {
         ),
         centerTitle: true,
         elevation: 0,
-        // Add logout button here
+        leading:IconButton(icon:Icon(Icons.calendar_month_outlined),
+        color: Colors.white,
+        onPressed:()=> Get.toNamed(Routes.CALENDAR, arguments: {
+          'from': Get.currentRoute,
+  },),),
         actions: [
           IconButton(
             icon: Icon(Icons.logout, color: Colors.white),

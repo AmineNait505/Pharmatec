@@ -15,7 +15,7 @@ class StatusController extends GetxController {
 
   Future<void> loadClientData() async {
     final prefs = await SharedPreferences.getInstance();
-    clientId.value = prefs.getString('client_id') ?? 'Unknown';
+    clientId.value = prefs.getString('client_business_relation') ?? 'Unknown';
 
     if (clientId.isNotEmpty) {
       await fetchClientStatus();
